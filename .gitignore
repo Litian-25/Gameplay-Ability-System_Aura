@@ -14,3 +14,7 @@ Build
 *.suo
 *.xcodeproj
 *.xcworkspace
+
+*.iml
+*.ipr
+*.iws
