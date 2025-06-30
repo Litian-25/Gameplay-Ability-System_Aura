@@ -6,6 +6,7 @@ Build
 
 .vscode
 .vs
+.idea/
 *.VC.db
 *.opensdf
 *.opendb
@@ -14,3 +15,7 @@ Build
 *.suo
 *.xcodeproj
 *.xcworkspace
+
+*.iml
+*.ipr
+*.iws
