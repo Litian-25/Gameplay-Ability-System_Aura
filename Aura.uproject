@@ -27,10 +27,6 @@
 		{
 			"Name": "GameplayAbilities",
 			"Enabled": true
-		},
-		{
-			"Name": "UnrealCV",
-			"Enabled": true
 		}
 	]
 }
