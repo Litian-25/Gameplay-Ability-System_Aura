@@ -1,0 +1,76 @@
+﻿Log file open, 07/01/25 05:54:22
+LogWindows: Failed to load 'aqProf.dll' (GetLastError=126)
+LogWindows: File 'aqProf.dll' does not exist
+LogProfilingDebugging: Loading WinPixEventRuntime.dll for PIX profiling (from ../../../Engine/Binaries/ThirdParty/Windows/WinPixEventRuntime/x64).
+LogWindows: Failed to load 'VtuneApi.dll' (GetLastError=126)
+LogWindows: File 'VtuneApi.dll' does not exist
+LogWindows: Failed to load 'VtuneApi32e.dll' (GetLastError=126)
+LogWindows: File 'VtuneApi32e.dll' does not exist
+LogWindows: Started CrashReportClient (pid=17580)
+LogWindows: Enabling Tpause support
+LogWindows: Custom abort handler registered for crash reporting.
+LogInit: Display: Running engine for game: Aura
+LogCore: UnrealTraceServer: Trace store launch successful
+LogTrace: Initializing trace...
+LogCore: Display: Requested channels: 'cpu,gpu,frame,log,bookmark,screenshot,region'
+LogTrace: Finished trace initialization.
+LogCsvProfiler: Display: Metadata set : platform="Windows"
+LogCsvProfiler: Display: Metadata set : config="Development"
+LogCsvProfiler: Display: Metadata set : buildversion="++UE5+Release-5.3-CL-29314046"
+LogCsvProfiler: Display: Metadata set : engineversion="5.3.2-29314046+++UE5+Release-5.3"
+LogCsvProfiler: Display: Metadata set : os="Windows 11 (24H2) [10.0.26100.4351] "
+LogCsvProfiler: Display: Metadata set : cpu="GenuineIntel|13th Gen Intel(R) Core(TM) i7-13620H"
+LogCsvProfiler: Display: Metadata set : pgoenabled="0"
+LogCsvProfiler: Display: Metadata set : pgoprofilingenabled="0"
+LogCsvProfiler: Display: Metadata set : ltoenabled="0"
+LogCsvProfiler: Display: Metadata set : asan="0"
+LogCsvProfiler: Display: Metadata set : commandline="" D:\UnrealFolder_Ddrive\Aura\Aura.uproject""
+LogCsvProfiler: Display: Metadata set : loginid="dd9d69fe401e51a63346919ef86e5e27"
+LogCsvProfiler: Display: Metadata set : llm="0"
+LogStats: Stats thread started at 1.536108
+LogICUInternationalization: ICU TimeZone Detection - Raw Offset: +9:00, Platform Override: ''
+LogInit: Session CrashGUID >====================================================
+         Session CrashGUID >   UECC-Windows-03B8CC3C49CE1E8B673D358211D1D0C7
+         Session CrashGUID >====================================================
+LogConfig: Display: Loading Mac ini files took 0.03 seconds
+LogConfig: Display: Loading VulkanPC ini files took 0.03 seconds
+LogConfig: Display: Loading Android ini files took 0.03 seconds
+LogConfig: Display: Loading IOS ini files took 0.03 seconds
+LogConfig: Display: Loading Windows ini files took 0.03 seconds
+LogConfig: Display: Loading Unix ini files took 0.03 seconds
+LogConfig: Display: Loading TVOS ini files took 0.04 seconds
+LogConfig: Display: Loading LinuxArm64 ini files took 0.04 seconds
+LogConfig: Display: Loading Linux ini files took 0.04 seconds
+LogAssetRegistry: Display: Asset registry cache read as 16.8 MiB from D:/UnrealFolder_Ddrive/Aura/Intermediate/CachedAssetRegistry_0.bin
+Message dialog closed, result: No, title: Missing Plugin, text: This project requires the 'UnrealCV' plugin, which could not be found. Would you like to disable it and continue?
+
+If you do, you will no longer be able to open any assets created with it. If not, the application will close.
+LogPluginManager: Error: Unable to load plugin 'UnrealCV'. Aborting.
+LogCore: Engine exit requested (reason: EngineExit() was called)
+LogExit: Preparing to exit.
+LogVirtualization: UE::Virtualization was shutdown
+LogModuleManager: Shutting down and abandoning module IoStoreOnDemand (44)
+LogModuleManager: Shutting down and abandoning module AnimationModifiers (42)
+LogModuleManager: Shutting down and abandoning module AudioEditor (40)
+LogModuleManager: Shutting down and abandoning module PropertyEditor (39)
+LogModuleManager: Shutting down and abandoning module Virtualization (36)
+LogModuleManager: Shutting down and abandoning module MessageLog (35)
+LogModuleManager: Shutting down and abandoning module TextureCompressor (32)
+LogModuleManager: Shutting down and abandoning module OpenColorIOWrapper (31)
+LogModuleManager: Shutting down and abandoning module RenderCore (28)
+LogModuleManager: Shutting down and abandoning module Landscape (26)
+LogModuleManager: Shutting down and abandoning module SlateRHIRenderer (24)
+LogModuleManager: Shutting down and abandoning module AnimGraphRuntime (22)
+LogModuleManager: Shutting down and abandoning module Renderer (20)
+LogModuleManager: Shutting down and abandoning module Engine (18)
+LogModuleManager: Shutting down and abandoning module CoreUObject (16)
+LogModuleManager: Shutting down and abandoning module SandboxFile (14)
+LogModuleManager: Shutting down and abandoning module PakFile (12)
+LogPakFile: Destroying PakPlatformFile
+LogModuleManager: Shutting down and abandoning module RSA (11)
+LogModuleManager: Shutting down and abandoning module NetworkFile (8)
+LogModuleManager: Shutting down and abandoning module StreamingFile (6)
+LogModuleManager: Shutting down and abandoning module CookOnTheFly (4)
+LogModuleManager: Shutting down and abandoning module StorageServerClient (2)
+LogExit: Exiting.
+Log file closed, 07/01/25 05:54:23

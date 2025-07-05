@@ -2,6 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../../Program Files/Epic Games/UE_5.3/Engine/Plugins/Marketplace/unrealcv" vcs="Git" />
   </component>
 </project>

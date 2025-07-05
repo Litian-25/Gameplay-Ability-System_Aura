@@ -3,14 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+USTRUCT(BlueprintType)
+struct FUIWidgetRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag MessageTag = FGameplayTag();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText MessageText = FText();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<class UAuraUserWidget> MessageWidget;
+
+	UPROPERTY(editAnywhere, BlueprintReadOnly)
+	UTexture2D* Image = nullptr;
+};
+
+class UAuraUserWidget;
 struct FOnAttributeChangeData;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSinature, float, NewHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChangedSinature, float, NewMaxHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnManaChangedSinature, float, NewMana);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMaxManaChangedSinature, float, NewMaxMana);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSinature, float, NewValue);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
 
 /**
  * 
@@ -24,21 +43,31 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS Attributes")
-	FOnHealthChangedSinature OnHealthChanged;
+	FOnAttributeChangedSinature OnHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS Attributes")
-	FOnMaxHealthChangedSinature OnMaxHealthChanged;
+	FOnAttributeChangedSinature OnMaxHealthChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS Attributes")
-	FOnManaChangedSinature OnManaChanged;
+	FOnAttributeChangedSinature OnManaChanged;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS Attributes")
-	FOnMaxManaChangedSinature OnMaxManaChanged;
+	FOnAttributeChangedSinature OnMaxManaChanged;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS Attributes")
+	FMessageWidgetRowSignature MessageWidgetRowDelegate;
 protected:
-	void HealthChanged(const FOnAttributeChangeData& Data) const;
-	void MaxHealthChanged(const FOnAttributeChangeData& Data) const;
-	void ManaChanged(const FOnAttributeChangeData& Data) const;
-	void MaxManaChanged(const FOnAttributeChangeData& Data) const;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UDataTable> MessageWidgetDataTable;
 
+	template<typename  T>
+	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag Tag);
+	
 };
+
+template <typename T>
+T* UOverlayWidgetController::GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag Tag)
+{
+	return DataTable->FindRow<T>(Tag.GetTagName(), TEXT(""));
+
+}

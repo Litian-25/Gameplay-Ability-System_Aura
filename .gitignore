@@ -1,21 +1,21 @@
-Binaries
-DerivedDataCache
-Intermediate
-Saved
-Build
-
-.vscode
-.vs
-.idea/
+# Unreal Engine specific
+Binaries/
+Intermediate/
+DerivedDataCache/
+.vs/
+.vscode/
+*.tmp
+*.temp
 *.VC.db
 *.opensdf
 *.opendb
 *.sdf
-*.sln
-*.suo
-*.xcodeproj
-*.xcworkspace
+*.cachefile
+*.VC.VC.opendb
 
-*.iml
-*.ipr
-*.iws
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
