@@ -19,3 +19,7 @@ DerivedDataCache/
 *.user
 *.userosscache
 *.sln.docstates
+
+Saved/
+*.sln
+.idea/
