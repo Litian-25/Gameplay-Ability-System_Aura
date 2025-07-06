@@ -39,13 +39,20 @@ void AAuraCharacter::OnRep_PlayerState()
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	if (AuraPlayerState)
+	check (AuraPlayerState);
+	
+	UAbilitySystemComponent* ASC = AuraPlayerState->GetAbilitySystemComponent();
+	if (!ASC)
 	{
-		AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
-		Cast<UAuraAbilitySystemComponent>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfo();
-		AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
-		AttributeSet = AuraPlayerState->GetAttributeSet();
+		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is NULL in PlayerState!"));
+		return;
 	}
+    
+	ASC->InitAbilityActorInfo(AuraPlayerState, this);
+	Cast<UAuraAbilitySystemComponent>(ASC)->AbilityActorInfoSet();
+	AbilitySystemComponent = ASC;
+	AttributeSet = AuraPlayerState->GetAttributeSet();
+	
     
 
 	// クライアント環境では他プレイヤーのControllerはnull
@@ -56,4 +63,5 @@ void AAuraCharacter::InitAbilityActorInfo()
 			AuraHUD->InitOverlay(AuraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
 		} 
 	}
+	InitializePrimaryAttributes();
 }

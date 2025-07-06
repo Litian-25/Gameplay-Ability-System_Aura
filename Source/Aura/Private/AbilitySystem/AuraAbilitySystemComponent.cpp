@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 
-void UAuraAbilitySystemComponent::AbilityActorInfo()
+void UAuraAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UAuraAbilitySystemComponent::EffectApplied);
 }
