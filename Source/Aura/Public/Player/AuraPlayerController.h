@@ -8,6 +8,7 @@
 #include "InputMappingContext.h"
 #include "AuraPlayerController.generated.h" 
 
+class UAuraAbilitySystemComponent;
 class UAuraInputConfig;
 struct FGameplayTag;
 class UInputMappingContext;
@@ -50,4 +51,10 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UAuraInputConfig> InputConfig;
+
+	UPROPERTY()
+	TObjectPtr<UAuraAbilitySystemComponent> AuraAbilitySystemComponent;
+
+	UAuraAbilitySystemComponent* GetASC();
+
 };

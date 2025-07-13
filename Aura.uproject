@@ -31,7 +31,7 @@
 		},
 		{
 			"Name": "UnrealCV",
-			"Enabled": true
+			"Enabled": false
 		}
 	]
 }
