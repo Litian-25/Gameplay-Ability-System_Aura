@@ -25,6 +25,21 @@ enum class EEffectRemovalPolicy
 	DoNotRemove
 };
 
+USTRUCT(BlueprintType)
+struct FGameplayEffectPolicy
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> GameplayEffectClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EEffectApplicationPolicy ApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditCondition = "ApplicationPolicy != EEffectApplicationPolicy::DoNotApply"))
+	EEffectRemovalPolicy RemovalPolicy = EEffectRemovalPolicy::DoNotRemove;
+};
+
 UCLASS()
 class AURA_API AAuraEffectActor : public AActor
 {
@@ -33,12 +48,11 @@ class AURA_API AAuraEffectActor : public AActor
 public:	
 	AAuraEffectActor();
 
-
 protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void ApplyEffectToTarget(AActor* TargetActor, TArray<TSubclassOf<UGameplayEffect>> GameplayEffectClasses);
+	void ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass);
 
 	UFUNCTION(BlueprintCallable)
 	void OnOverlap(AActor* TargetActor);
@@ -49,29 +63,34 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	bool bDestroyOnEffectRemoval = false;
 	
+	// 新しい構造：各エフェクトにポリシーを個別設定
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	TArray<FGameplayEffectPolicy> GameplayEffectPolicies;
+
+	// 後方互換性のため残す（非推奨）
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects|Legacy", meta = (DeprecatedProperty))
 	TArray<TSubclassOf<UGameplayEffect>> InstantGameplayEffectClasses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects|Legacy", meta = (DeprecatedProperty))
 	EEffectApplicationPolicy InstantEffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects|Legacy", meta = (DeprecatedProperty))
 	TArray<TSubclassOf<UGameplayEffect>> DurationGameplayEffectClasses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects|Legacy", meta = (DeprecatedProperty))
 	EEffectApplicationPolicy DurationEffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects|Legacy", meta = (DeprecatedProperty))
 	TArray<TSubclassOf<UGameplayEffect>> InfinityGameplayEffectClasses;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects|Legacy", meta = (DeprecatedProperty))
 	EEffectApplicationPolicy InfinityEffectApplicationPolicy = EEffectApplicationPolicy::DoNotApply;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects|Legacy", meta = (DeprecatedProperty))
 	EEffectRemovalPolicy InfinityEffectRemovalPolicy = EEffectRemovalPolicy::RemoveOnEndOverlap;
 
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectHandles;
 	
-    UPROPERTY(editAnywhere, BlueprintReadOnly, Category = "Applied Effects")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Applied Effects")
 	float ActorLevel = 1.f;
 };

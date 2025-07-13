@@ -12,7 +12,8 @@
 				"CoreUObject",
 				"Engine",
 				"GameplayAbilities",
-				"UMG"
+				"UMG",
+				"EnhancedInput"
 			]
 		}
 	],
@@ -26,6 +27,10 @@
 		},
 		{
 			"Name": "GameplayAbilities",
+			"Enabled": true
+		},
+		{
+			"Name": "UnrealCV",
 			"Enabled": true
 		}
 	]

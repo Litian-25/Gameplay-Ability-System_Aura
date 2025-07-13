@@ -14,65 +14,88 @@ AAuraEffectActor::AAuraEffectActor()
 void AAuraEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
-void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TArray<TSubclassOf<UGameplayEffect>> GameplayEffectClasses)
+void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
-	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent((TargetActor));
-	if (TargetASC == nullptr) return;
-
-	if (GameplayEffectClasses.Num() == 0) return;
-
-	// 配列内の各エフェクトを適用
-	for (const TSubclassOf<UGameplayEffect>& GameplayEffectClass : GameplayEffectClasses)
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (TargetASC == nullptr) 
 	{
-		if (!IsValid(GameplayEffectClass)) continue;
-        
-		FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
-		EffectContextHandle.AddSourceObject(this);
-		const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, ActorLevel, EffectContextHandle);
-		const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
-		const bool bIsInfinite = EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy == EGameplayEffectDurationType::Infinite;
+		UE_LOG(LogTemp, Warning, TEXT("TargetASC is null for actor: %s"), *TargetActor->GetName());
+		return;
+	}
 
-		if (bIsInfinite && InfinityEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
+	if (!IsValid(GameplayEffectClass)) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid GameplayEffect class"));
+		return;
+	}
+        
+	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, ActorLevel, EffectContextHandle);
+	
+	if (EffectSpecHandle.IsValid())
+	{
+		const FActiveGameplayEffectHandle ActiveEffectHandle = TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
+		UE_LOG(LogTemp, Warning, TEXT("Applied effect: %s to %s"), *GameplayEffectClass->GetName(), *TargetActor->GetName());
+		
+		const bool bIsInfinite = EffectSpecHandle.Data.Get()->Def.Get()->DurationPolicy == EGameplayEffectDurationType::Infinite;
+		if (bIsInfinite)
 		{
 			ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create effect spec for: %s"), *GameplayEffectClass->GetName());
 	}
 }
 
 void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 {
+	UE_LOG(LogTemp, Warning, TEXT("=== OnOverlap Called ==="));
+	UE_LOG(LogTemp, Warning, TEXT("Target Actor: %s"), *TargetActor->GetName());
+
+	// 新しいポリシー配列構造を使用
+	for (const FGameplayEffectPolicy& Policy : GameplayEffectPolicies)
+	{
+		if (Policy.ApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap && IsValid(Policy.GameplayEffectClass))
+		{
+			ApplyEffectToTarget(TargetActor, Policy.GameplayEffectClass);
+		}
+	}
+
+	// 後方互換性のため、レガシー配列もサポート
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
-		for (const TSubclassOf<UGameplayEffect>& Effect  : InstantGameplayEffectClasses)
+		for (const TSubclassOf<UGameplayEffect>& EffectClass : InstantGameplayEffectClasses)
 		{
-			if (Effect)
+			if (IsValid(EffectClass))
 			{
-				ApplyEffectToTarget(TargetActor, InstantGameplayEffectClasses);
+				ApplyEffectToTarget(TargetActor, EffectClass);
 			}
 		}
 	}
 
 	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
-		for (const TSubclassOf<UGameplayEffect>& Effect  : DurationGameplayEffectClasses)
+		for (const TSubclassOf<UGameplayEffect>& EffectClass : DurationGameplayEffectClasses)
 		{
-			if (Effect)
+			if (IsValid(EffectClass))
 			{
-				ApplyEffectToTarget(TargetActor, DurationGameplayEffectClasses);
+				ApplyEffectToTarget(TargetActor, EffectClass);
 			}
 		}
 	}
 
 	if (InfinityEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
-		for (const TSubclassOf<UGameplayEffect>& Effect  : InfinityGameplayEffectClasses)
+		for (const TSubclassOf<UGameplayEffect>& EffectClass : InfinityGameplayEffectClasses)
 		{
-			if (Effect)
+			if (IsValid(EffectClass))
 			{
-				ApplyEffectToTarget(TargetActor, InfinityGameplayEffectClasses);
+				ApplyEffectToTarget(TargetActor, EffectClass);
 			}
 		}
 	}
@@ -80,62 +103,63 @@ void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 
 void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
 {
-	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
+	UE_LOG(LogTemp, Warning, TEXT("=== OnEndOverlap Called ==="));
+	UE_LOG(LogTemp, Warning, TEXT("Target Actor: %s"), *TargetActor->GetName());
+
+	// 新しいポリシー配列構造を使用
+	for (const FGameplayEffectPolicy& Policy : GameplayEffectPolicies)
 	{
-		for (const TSubclassOf<UGameplayEffect>& Effect  : InstantGameplayEffectClasses)
+		if (Policy.ApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap && IsValid(Policy.GameplayEffectClass))
 		{
-			if (Effect)
-			{
-				ApplyEffectToTarget(TargetActor, InstantGameplayEffectClasses);
-			}
+			ApplyEffectToTarget(TargetActor, Policy.GameplayEffectClass);
 		}
 	}
 
-	if (DurationEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
+	// エフェクト削除処理（重複削除を防ぐため統合）
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (!IsValid(TargetASC)) return;
+
+	TArray<FActiveGameplayEffectHandle> HandlesToRemove;
+	
+	// 削除が必要かチェック（新しいポリシーまたはレガシーポリシー）
+	bool bShouldRemoveEffects = false;
+	
+	// 新しいポリシー配列をチェック
+	for (const FGameplayEffectPolicy& Policy : GameplayEffectPolicies)
 	{
-		for (const TSubclassOf<UGameplayEffect>& Effect  : DurationGameplayEffectClasses)
+		if (Policy.RemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
 		{
-			if (Effect)
-			{
-				ApplyEffectToTarget(TargetActor, DurationGameplayEffectClasses);
-			}
+			bShouldRemoveEffects = true;
+			break;
 		}
 	}
 	
-	if (InfinityEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
-	{
-		for (const TSubclassOf<UGameplayEffect>& Effect  : InfinityGameplayEffectClasses)
-		{
-			if (Effect)
-			{
-				ApplyEffectToTarget(TargetActor, InfinityGameplayEffectClasses);
-			}
-		}
-	}
-
+	// レガシーポリシーもチェック
 	if (InfinityEffectRemovalPolicy == EEffectRemovalPolicy::RemoveOnEndOverlap)
 	{
-		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent((TargetActor));
-		if (!IsValid(TargetASC)) return;
+		bShouldRemoveEffects = true;
+	}
 
-		TArray<FActiveGameplayEffectHandle> HandlesToRemove;
-		for (TPair<FActiveGameplayEffectHandle, UAbilitySystemComponent*> HandlePair  : ActiveEffectHandles)
+	// 削除処理を一度だけ実行
+	if (bShouldRemoveEffects)
+	{
+		for (TPair<FActiveGameplayEffectHandle, UAbilitySystemComponent*> HandlePair : ActiveEffectHandles)
 		{
 			if (TargetASC == HandlePair.Value)
 			{
-				TargetASC->RemoveActiveGameplayEffect(HandlePair.Key);
-				HandlesToRemove.Add(HandlePair.Key);
+				bool bRemoved = TargetASC->RemoveActiveGameplayEffect(HandlePair.Key);
+				if (bRemoved)
+				{
+					HandlesToRemove.Add(HandlePair.Key);
+					UE_LOG(LogTemp, Warning, TEXT("Removed active effect"));
+				}
 			}
 		}
 
-		for (FActiveGameplayEffectHandle& Handle  : HandlesToRemove)
+		// 削除したハンドルをマップから除去
+		for (FActiveGameplayEffectHandle& Handle : HandlesToRemove)
 		{
 			ActiveEffectHandles.FindAndRemoveChecked(Handle);
 		}
-		
 	}
-}	
-
-
-
-
+}

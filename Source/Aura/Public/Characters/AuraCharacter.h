@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EngineUtils.h"
 #include "Characters/AuraCharacterBase.h"
 #include "AuraCharacter.generated.h"
           
@@ -19,6 +20,10 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 
+	// Combat Interface
+	virtual int32 GetPlayerLevel() override;
+	// end Combat Interface
+	
 private:
 	void InitAbilityActorInfo() override;
 };

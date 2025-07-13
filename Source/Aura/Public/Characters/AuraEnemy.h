@@ -17,11 +17,22 @@ class AURA_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInterface
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void InitAbilityActorInfo() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
+	int32 Level = 1;
 	
 public:
 	AAuraEnemy();
+
+	//Enemy Interface
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	// end Enemy Interface
 
-	virtual void InitAbilityActorInfo() override;
+	// Combat Interface
+	virtual int32 GetPlayerLevel() override;
+	//end Combat Interface
+
+
 };
