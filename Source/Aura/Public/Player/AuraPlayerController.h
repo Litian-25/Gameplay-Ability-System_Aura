@@ -8,6 +8,7 @@
 #include "InputMappingContext.h"
 #include "AuraPlayerController.generated.h" 
 
+class USplineComponent;
 class UAuraAbilitySystemComponent;
 class UAuraInputConfig;
 struct FGameplayTag;
@@ -31,7 +32,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-
+	
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> AuraContext;
@@ -57,4 +58,18 @@ private:
 
 	UAuraAbilitySystemComponent* GetASC();
 
+	FVector CachedDestination = FVector::ZeroVector;
+	float FollowTime = 0.f;
+	float ShortPressThreshold = 0.5f;
+	bool bAutoRunning = false;
+
+	UPROPERTY(EditDefaultsOnly)
+	float AutoRunAcceptanceRadius = 50.f;
+
+	UPROPERTY(visibleAnywhere)
+	TObjectPtr<USplineComponent> Spline;
+
+	bool bTargeting = false;
+
+	void AutoRun();
 };
