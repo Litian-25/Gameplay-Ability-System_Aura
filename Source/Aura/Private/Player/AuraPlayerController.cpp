@@ -88,7 +88,6 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AAuraPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 
 	if (!CursorHit.bBlockingHit) return;
@@ -96,50 +95,13 @@ void AAuraPlayerController::CursorTrace()
 	LastActor = ThisActor;
 	ThisActor = CursorHit.GetActor();
 
-	/**
-	*A. LastActor is null & ThisActor is null
-	*	- Do nothing
-	*B. LastActor is null & ThisActor is valid
-	*	- Highlight ThisActor
-	*C. LastActor is valid & ThisActor is null
-	*	- UnHighlight LastActor
-	*D. Both actors are valid, but LastActor != ThisActor
-	*	- UnHighlight LastActor, and Highlight ThisActor
-	*E.Both actors are valid, and are the same actor
-	*	- Do nothing
-	*/
+	if (LastActor != ThisActor)
+	{
+		if (LastActor) LastActor->UnHighlightActor();
+		if (ThisActor) ThisActor->HighlightActor();
+	}
 
-	if (LastActor == nullptr) 
-	{
-		if (ThisActor != nullptr)
-		{
-			// case B
-			ThisActor->HighlightActor();
-		}
-		else
-		{
-			// Case A - both are null
-		}
-	}
-	else // LastActor is valid
-	{
-		if (ThisActor == nullptr)
-		{
-			LastActor->UnHighlightActor();
-		}
-		else // both actors are valid
-		{
-			if (LastActor != ThisActor)
-			{
-				LastActor->UnHighlightActor();
-				ThisActor->HighlightActor();
-			}
-			else
-			{
-				// Case E - do nothing
-			}
-		}
-	}
+	
 }
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
@@ -157,10 +119,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	// 左マウス以外の時
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 		return;
 	}
 
@@ -168,15 +127,12 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	// 敵をクリックした時
 	if (bTargeting)
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 	}
 	else
 	{
 		// 何もターゲットしていない：ワンクリック移動
-		APawn* ControllerPawn = GetPawn<APawn>();
+		const APawn* ControllerPawn = GetPawn<APawn>();
 		if (FollowTime <= ShortPressThreshold && ControllerPawn)
 		{
 			// 短押し判定、パスファインディング処理の実装
@@ -194,18 +150,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				{
 					// Navpathの経由地をSplineに追加
 					Spline->AddSplinePoint(PointLocation, ESplineCoordinateSpace::World);
-
-					DrawDebugSphere(
-						GetWorld(),
-						PointLocation,
-						8.f,
-						8,
-						FColor::Green,
-						false,
-						5.f
-					);
 				}
-
 				bAutoRunning = true;
 			}
 		}
@@ -221,10 +166,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	// 左マウスボタン以外の処理
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 		return;
 	}
 
@@ -232,10 +174,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	// 敵をクリックした時
 	if (bTargeting)
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 	}
 	else
 	{
@@ -243,20 +182,14 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		// マウス押下時間の累積
 		FollowTime += GetWorld()->GetDeltaSeconds();
 
-		// マウスカーソル下の3D座標取得
-		FHitResult Hit;
-		if (GetHitResultUnderCursor(ECC_Visibility, false, Hit))
-		{
-			// 目標地点の更新
-			CachedDestination = Hit.Location;
-		}
+		// マウスカーソル下の3D座標取得し、目標地点の更新
+		if (CursorHit.bBlockingHit) CachedDestination = CursorHit.Location;
 
 		// 移動実行
 		if (APawn* ControllerPawn = GetPawn())
 		{
 			// 移動方向の計算（ベクトルの正規化込み）
 			const FVector WorldDirection = (CachedDestination - ControllerPawn->GetActorLocation()).GetSafeNormal();
-
 			ControllerPawn->AddMovementInput(WorldDirection);
 		}
 	}

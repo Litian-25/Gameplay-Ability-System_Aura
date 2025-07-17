@@ -58,3 +58,9 @@ void AAuraCharacterBase::AddCharacterAbilities()
 	AuraASC->AddCharacterAbilities(StartupAbilities);
 	
 }
+
+FVector AAuraCharacterBase::GetCombatSocketLocation() const
+{
+	check(Weapon);
+	return Weapon->GetSocketLocation(WeaponTipSocketName);
+}
