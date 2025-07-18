@@ -32,6 +32,10 @@
 		{
 			"Name": "UnrealCV",
 			"Enabled": false
+		},
+		{
+			"Name": "MotionWarping",
+			"Enabled": true
 		}
 	]
 }

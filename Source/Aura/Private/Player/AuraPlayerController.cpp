@@ -53,12 +53,27 @@ void AAuraPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
+	// Input Bindingを行う
 	UAuraEnhancedInputComponent* AuraInputComponent = CastChecked<UAuraEnhancedInputComponent>(InputComponent);
 	AuraInputComponent->BindAction(
 		MoveAction, 
 		ETriggerEvent::Triggered, 
 		this, 
 		&AAuraPlayerController::Move
+	);
+
+	AuraInputComponent->BindAction(
+		ShiftAction, 
+		ETriggerEvent::Started, 
+		this, 
+		&AAuraPlayerController::ShiftPressed
+	);
+
+	AuraInputComponent->BindAction(
+		ShiftAction, 
+		ETriggerEvent::Completed, 
+		this, 
+		&AAuraPlayerController::ShiftReleased
 	);
 
 	AuraInputComponent->BindAbilityActions(
@@ -123,13 +138,12 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		return;
 	}
 
+	// 常にASCに通知
+	if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
+	
 	/* 左マウスの場合 */
 	// 敵をクリックした時
-	if (bTargeting)
-	{
-		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
-	}
-	else
+	if (!bTargeting || bShiftKeyDown)
 	{
 		// 何もターゲットしていない：ワンクリック移動
 		const APawn* ControllerPawn = GetPawn<APawn>();
@@ -172,7 +186,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 
 	/* 左マウスの場合 */
 	// 敵をクリックした時
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 	}

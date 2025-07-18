@@ -14,7 +14,7 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	
 }
 
-void UAuraProjectileSpell::SpawnProjectile()
+void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocation)
 {
 	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer) return;
@@ -24,11 +24,19 @@ void UAuraProjectileSpell::SpawnProjectile()
 	if (CombatInterface)
 	{
 		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+
+		// Projectileの方向計算(Target - Socketで方向ベクトル算出)
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+
+		// Pitchを0にし、地面と平行で発射(水平発射）
+		Rotation.Pitch = 0.0f;
+		
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);
 
-		// TODO: Set the Projectile Rotation
-
+		// 回転設定
+		SpawnTransform.SetRotation(Rotation.Quaternion());
+		
 		// Projectileに設定や情報を持たせる
 		AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(
 			ProjectileClass,

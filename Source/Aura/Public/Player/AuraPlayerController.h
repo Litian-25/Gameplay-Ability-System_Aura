@@ -40,6 +40,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
+
 	void Move(const FInputActionValue& InputActionValue);
 
 	void CursorTrace();
@@ -47,9 +50,13 @@ private:
 	TScriptInterface<IEnemyInterface> ThisActor;
 	FHitResult CursorHit;
 
+	// Call Back関数
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
 	void AbilityInputTagHeld(FGameplayTag InputTag);
+
+	void ShiftPressed(){bShiftKeyDown = true;};
+	void ShiftReleased(){bShiftKeyDown = false;};
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UAuraInputConfig> InputConfig;
@@ -67,10 +74,11 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float AutoRunAcceptanceRadius = 50.f;
 
-	UPROPERTY(visibleAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> Spline;
 
 	bool bTargeting = false;
+	bool bShiftKeyDown = false;
 
 	void AutoRun();
 };
